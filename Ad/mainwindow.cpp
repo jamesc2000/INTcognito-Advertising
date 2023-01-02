@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     QChart *chart = new QChart();
     //chart->legend()->hide();
     chart->legend()->setVisible(true);
-    chart->legend()setAlignment(Qt::AlignBottom);
+    chart->legend()->setAlignment(Qt::AlignBottom);
     chart->addSeries(series);
     chart->createDefaultAxes();
     chart->setTitle("example");
