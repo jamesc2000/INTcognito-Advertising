@@ -14,6 +14,7 @@ public:
 
 public slots:
     void networkReplyReadyRead();
+    void testWrite();
 signals:
 
 private:
