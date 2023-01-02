@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1160</width>
-    <height>583</height>
+    <width>1197</width>
+    <height>661</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>840</x>
       <y>30</y>
-      <width>301</width>
-      <height>521</height>
+      <width>311</width>
+      <height>381</height>
      </rect>
     </property>
     <property name="title">
@@ -65,8 +65,8 @@
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>340</y>
+       <x>180</x>
+       <y>180</y>
        <width>111</width>
        <height>100</height>
       </rect>
@@ -100,8 +100,8 @@
       <rect>
        <x>20</x>
        <y>180</y>
-       <width>150</width>
-       <height>137</height>
+       <width>151</width>
+       <height>131</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -138,8 +138,8 @@
     <widget class="QPushButton" name="pushButton">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>470</y>
+       <x>40</x>
+       <y>330</y>
        <width>241</width>
        <height>29</height>
       </rect>
@@ -162,65 +162,88 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>30</y>
-      <width>761</width>
-      <height>521</height>
+      <x>840</x>
+      <y>420</y>
+      <width>311</width>
+      <height>181</height>
      </rect>
     </property>
     <property name="title">
-     <string>DATA VISUALIZATION</string>
+     <string>Estimated Busiest Time of the Day</string>
     </property>
-    <widget class="QFrame" name="horizontalFrame">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>60</y>
-       <width>661</width>
-       <height>201</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout"/>
+   </widget>
+   <widget class="QTabWidget" name="Predictor">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>10</y>
+      <width>731</width>
+      <height>591</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Gender</string>
+     </attribute>
+     <widget class="QFrame" name="horizontalFrame">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>701</width>
+        <height>491</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout"/>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>211</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Predicted Gender Group</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QFrame" name="horizontalFrame_2">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>310</y>
-       <width>661</width>
-       <height>201</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2"/>
-    </widget>
-    <widget class="QLabel" name="label_5">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>211</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Predicted Gender Group</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>280</y>
-       <width>211</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Predicted Age Group</string>
-     </property>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Age</string>
+     </attribute>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>211</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Predicted Age Group</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="horizontalFrame_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>701</width>
+        <height>451</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+     </widget>
     </widget>
    </widget>
   </widget>
