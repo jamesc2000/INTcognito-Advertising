@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QString>
+#include <QList>
 
 class Databasehandler : public QObject
 {
@@ -15,6 +17,7 @@ public:
 public slots:
     void networkReplyReadyRead();
     void testWrite();
+
 signals:
 
 private:

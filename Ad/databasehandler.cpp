@@ -4,17 +4,14 @@
 #include <QVariantMap>
 #include <QDebug>
 #include <QDateTime>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QList>
 
 Databasehandler::Databasehandler(QObject *parent)
     : QObject(parent)
 {
-    qInfo("Dito simula");
     m_networkManager = new QNetworkAccessManager( this );
-
-//    m_networkReply = m_networkManager->get(QNetworkRequest(QUrl("https://firestore.googleapis.com/v1/projects/intcognito-advertising/databases/(default)/documents/people/data")));
-//    connect(m_networkReply, &QNetworkReply::readyRead, this, &Databasehandler::networkReplyReadyRead);
-//    qInfo("Dito pagtapos");
-
 }
 
 Databasehandler::~Databasehandler()
@@ -47,6 +44,5 @@ void Databasehandler::testWrite() {
     m_networkReply = m_networkManager->post( newpeopleRequest, jsonDoc.toJson() );
     connect(m_networkReply, &QNetworkReply::readyRead, this, &Databasehandler::networkReplyReadyRead);
 
-    qDebug() << m_networkReply->readAll();
     qDebug("Test write done");
 }
