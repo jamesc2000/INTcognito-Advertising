@@ -7,28 +7,43 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QLineSeries *series = new QLineSeries();
-
-    //mock data
-    series->append(0,6);
-    series->append(2,4);
-    series->append(3,8);
-    series->append(7,4);
-    series->append(10,5);
-
-    *series << QPointF(11,1) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+    QLineSeries *gender1 = new QLineSeries();
+    QLineSeries *gender2 = new QLineSeries();
+    //Mock Data
+    //Data for 0-24
+    *gender1 << QPointF(11,1) << QPointF(11,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+    *gender2 << QPointF(11,3) << QPointF(10,3) << QPointF(17,4) << QPointF(11,3)<< QPointF(10,2);
 
     QChart *chart = new QChart();
-    //chart->legend()->hide();
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
-    chart->addSeries(series);
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->addSeries(gender1);
+    chart->addSeries(gender2);
     chart->createDefaultAxes();
-    chart->setTitle("example");
+//    chart->setTitle("example");
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setParent(ui->horizontalFrame);
+
+    QLineSeries *age1 = new QLineSeries();
+
+    //mock data
+    *age1 << QPointF(11,11) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+
+    QChart *chart2 = new QChart();
+    //chart->legend()->hide();
+    chart2->legend()->setVisible(true);
+    chart2->legend()->setAlignment(Qt::AlignBottom);
+    chart2->addSeries(age1);
+    chart2->createDefaultAxes();
+    chart2->setTitle("example");
+
+    QChartView *chartView2 = new QChartView(chart2);
+    chartView2->setRenderHint(QPainter::Antialiasing);
+//    chartView->setParent(ui->horizontalFrame);
+    chartView2->setParent(ui->horizontalFrame_2);
 
     manager = new QNetworkAccessManager();
     QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(managerFinished(QNetworkReply*)));
