@@ -133,6 +133,8 @@ void MainWindow::on_pushButton_clicked()
     ageButtonList.append(ui->r_0_24);
     ageButtonList.append(ui->r_25_49);
     ageButtonList.append(ui->r_50_74);
+    ageButtonList.append(ui->r_75_99);
+    ageButtonList.append(ui->r_100_124);
     QList<QString> checkedAges;
     for (int i = 0; i < ageButtonList.size(); ++i) {
         if (ageButtonList[i]->isChecked()) {

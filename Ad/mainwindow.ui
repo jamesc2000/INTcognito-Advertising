@@ -39,7 +39,7 @@
       <string>Add Advertisement Image URL</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="adNameEdit">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -67,7 +67,7 @@
       <rect>
        <x>180</x>
        <y>170</y>
-       <width>111</width>
+       <width>112</width>
        <height>100</height>
       </rect>
      </property>
@@ -80,14 +80,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_4">
+       <widget class="QCheckBox" name="r_male">
         <property name="text">
          <string>Male</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_5">
+       <widget class="QCheckBox" name="r_female">
         <property name="text">
          <string>Female</string>
         </property>
@@ -100,8 +100,8 @@
       <rect>
        <x>20</x>
        <y>170</y>
-       <width>151</width>
-       <height>201</height>
+       <width>154</width>
+       <height>211</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -113,35 +113,35 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_3">
+       <widget class="QCheckBox" name="r_0_24">
         <property name="text">
          <string>0-24 yrs old</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton">
+       <widget class="QCheckBox" name="r_25_49">
         <property name="text">
          <string>25-49 yrs old</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_2">
+       <widget class="QCheckBox" name="r_50_74">
         <property name="text">
          <string>50-74 yrs old</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_6">
+       <widget class="QCheckBox" name="r_75_99">
         <property name="text">
          <string>75-99 yrs old</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_7">
+       <widget class="QCheckBox" name="r_100_124">
         <property name="text">
          <string>100-124 yrs old</string>
         </property>
@@ -165,7 +165,7 @@
       <string>Add Advertisement</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_2">
+    <widget class="QLineEdit" name="urlEdit">
      <property name="geometry">
       <rect>
        <x>20</x>
