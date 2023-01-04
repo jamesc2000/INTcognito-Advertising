@@ -401,6 +401,12 @@ void MainWindow::onChartResponse() {
         gender1->append(tempDate.toMSecsSinceEpoch(), tempNFemale);
         gender2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["nMale"].toInt());
 
+        age1->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n0_24"].toInt());
+        age2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n25_49"].toInt());
+        age3->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n50_74"].toInt());
+        age4->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n75_99"].toInt());
+        age5->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n100_124"].toInt());
+
         chart->scroll(chart->plotArea().width() / 10, 0);
     }
 }
