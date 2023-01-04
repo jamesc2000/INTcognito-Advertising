@@ -12,6 +12,7 @@
 #include <QDateTime>
 #include <QDateTimeAxis>
 #include <QValueAxis>
+#include <QVariantMap>
 
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -40,6 +41,21 @@ private:
     Ui::MainWindow *ui;
     QNetworkAccessManager *manager;
     QNetworkRequest request;
+    QNetworkReply * m_networkReply;
     void uploadAd(QString adName, QList<QString> ageGroups, QList<QString> genders, QString imageUrl);
+    void getChartData();
+    void onChartResponse();
+
+    QLineSeries *gender1;
+    QLineSeries *gender2;
+
+    QLineSeries *age1;
+    QLineSeries *age2;
+    QLineSeries *age3;
+    QLineSeries *age4;
+    QLineSeries *age5;
+
+    QChart *chart;
+    QChart *chart2;
 };
 #endif // MAINWINDOW_H

@@ -7,8 +7,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QLineSeries *gender1 = new QLineSeries();
-    QLineSeries *gender2 = new QLineSeries();
+    manager = new QNetworkAccessManager();
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(managerFinished(QNetworkReply*)));
+
+    getChartData();
+
+    gender1 = new QLineSeries();
+    gender2 = new QLineSeries();
+
     gender1->setName("Female");
     gender2->setName("Male");
     //Mock Data
@@ -16,11 +22,11 @@ MainWindow::MainWindow(QWidget *parent)
     //(timestamp,y axis
 
 
-
     *gender1 << QPointF(1,2) << QPointF(2,3) << QPointF(3,6) << QPointF(4,3)<< QPointF(5,2);
-    *gender2 << QPointF(3,1); /*<< QPointF(axisX,3) << QPointF(axisX,6) << QPointF(axisX,3)<< QPointF(axisX,2);*/
+//    *gender1 << QPointF(10000000, 100) << QPointF(10000000, 100) << QPointF(10000000, 100);
+//    *gender2 << QPointF(3,1); /*<< QPointF(axisX,3) << QPointF(axisX,6) << QPointF(axisX,3)<< QPointF(axisX,2);*/
 
-    QChart *chart = new QChart();
+    chart = new QChart();
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
     chart->setAnimationOptions(QChart::AllAnimations);
@@ -30,13 +36,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     QDateTimeAxis *axisX = new QDateTimeAxis;
     axisX->setTickCount(10);
-    axisX->setFormat("MMM yyyy");
+    axisX->setFormat("dd hh");
     axisX->setTitleText("Date");
     chart->addAxis(axisX, Qt::AlignBottom);
     gender1->attachAxis(axisX);
     gender2->attachAxis(axisX);
 
-    QDateTime hourly = QDateTime::fromString("January 4 2023");
     QValueAxis *axisY = new QValueAxis;
     axisY->setTitleText("numbers");
     axisY->setTickCount(10);
@@ -49,11 +54,11 @@ MainWindow::MainWindow(QWidget *parent)
     chartView->setParent(ui->horizontalFrame);
 
     //Age Group Chart
-    QLineSeries *age1 = new QLineSeries();
-    QLineSeries *age2 = new QLineSeries();
-    QLineSeries *age3 = new QLineSeries();
-    QLineSeries *age4 = new QLineSeries();
-    QLineSeries *age5 = new QLineSeries();
+    age1 = new QLineSeries();
+    age2 = new QLineSeries();
+    age3 = new QLineSeries();
+    age4 = new QLineSeries();
+    age5 = new QLineSeries();
     age1->setName("0-24 yrs old");
     age2->setName("25-49 yrs old");
     age3->setName("50-74 yrs old");
@@ -68,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     *age4 << QPointF(11,14) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
     *age5 << QPointF(11,10) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
 
-    QChart *chart2 = new QChart();
+    chart2 = new QChart();
     //chart->legend()->hide();
     chart2->legend()->setVisible(true);
     chart2->legend()->setAlignment(Qt::AlignBottom);
@@ -84,8 +89,6 @@ MainWindow::MainWindow(QWidget *parent)
     chartView2->setRenderHint(QPainter::Antialiasing);
     chartView2->setParent(ui->horizontalFrame_2);
 
-    manager = new QNetworkAccessManager();
-    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(managerFinished(QNetworkReply*)));
 }
 
 MainWindow::~MainWindow()
@@ -218,3 +221,186 @@ void MainWindow::on_pushButton_clicked()
     uploadAd(adName, checkedAges, checkedGenders, imageUrl);
 }
 
+void MainWindow::getChartData() {
+    qDebug("Get chart data");
+
+    QJsonObject query, from, collectionId;
+
+    collectionId.insert("collectionId", "people");
+    from.insert("from", collectionId);
+    query.insert("structuredQuery", from);
+
+    QJsonDocument jsonDoc(query);
+    qDebug(jsonDoc.toJson());
+
+    QNetworkRequest newpeopleRequest( QUrl("https://firestore.googleapis.com/v1beta1/projects/intcognito-advertising/databases/(default)/documents:runQuery"));
+    newpeopleRequest.setHeader( QNetworkRequest::ContentTypeHeader, QString("application/json"));
+    m_networkReply = manager->post( newpeopleRequest, jsonDoc.toJson() );
+    connect(m_networkReply, &QNetworkReply::readyRead, this, &MainWindow::onChartResponse);
+}
+
+void MainWindow::onChartResponse() {
+    QJsonDocument resDoc;
+    resDoc = QJsonDocument::fromJson(m_networkReply->readAll());
+
+    QJsonArray object = resDoc.array();
+
+    QList<QString> dateTimeList;
+    foreach (const QJsonValue& arrEl, object) {
+        QString tempTime;
+
+        tempTime = arrEl.toObject().value("document")
+                    .toObject().value("fields")
+                    .toObject().value("Time")
+                    .toObject().value("timestampValue").toString();
+        dateTimeList.append(tempTime);
+
+    }
+
+    QList<QVariantMap> output;
+
+    // [{period: DateTime, maleCount: int, femaleCount, n0_24, etc etc}, ...]
+    // 1. Sort date time list in ascending order
+    // 2. First element of date time list will be our beginning period (round off to nearest hour)
+    // 3. Last element of list+1 will be our end period
+    // 4. From beginning period, count up, adding one minute each, until last element is reached
+    //
+
+    dateTimeList.sort();
+
+    QList<QDateTime> legitDateTimeList;
+
+    for (int i = 0; i < dateTimeList.size(); ++i) {
+        qDebug() << dateTimeList[i];
+        legitDateTimeList.append(QDateTime::fromString(dateTimeList[i], Qt::ISODate));
+    }
+
+    QDate startDate = legitDateTimeList[0].date();
+    QTime startTime = legitDateTimeList[0].time();
+    startTime.setHMS(startTime.hour(), 0, 0);
+
+    QDateTime startPeriod;
+    startPeriod.setDate(startDate);
+    startPeriod.setTime(startTime);
+
+    QDate endDate = legitDateTimeList.last().date();
+    QTime endTime = legitDateTimeList.last().time();
+    endTime.setHMS(endTime.hour(), 0, 0);
+
+    QDateTime endPeriod;
+    endPeriod.setDate(endDate);
+    endPeriod.setTime(endTime);
+
+    for (QDateTime dt = startPeriod; dt < endPeriod; dt = dt.addSecs(3600)) {
+        QVariantMap temp;
+        temp["period"] = dt;
+        output.append(temp);
+    }
+
+    int n0_24 = 0;
+    int n25_49 = 0;
+    int n50_74 = 0;
+    int n75_99 = 0;
+    int n100_124 = 0;
+
+    int nMale = 0;
+    int nFemale = 0;
+
+
+    foreach (const QJsonValue& arrEl, object) {
+        QString tempAge, tempGender;
+        QDateTime tempTime;
+
+        tempAge = arrEl.toObject().value("document")
+                    .toObject().value("fields")
+                    .toObject().value("Age")
+                    .toObject().value("stringValue").toString();
+
+        tempGender = arrEl.toObject().value("document")
+                    .toObject().value("fields")
+                    .toObject().value("Gender")
+                    .toObject().value("stringValue").toString();
+
+        tempTime = QDateTime::fromString(arrEl.toObject().value("document")
+                    .toObject().value("fields")
+                    .toObject().value("Time")
+                    .toObject().value("timestampValue").toString(), Qt::ISODate);
+
+        for (int i = 0; i < output.size(); ++i) {
+            n0_24 = 0;
+            n25_49 = 0;
+            n50_74 = 0;
+            n75_99 = 0;
+            n100_124 = 0;
+
+            nMale = 0;
+            nFemale = 0;
+
+            QVariantMap currObj = output[i];
+            QDateTime currTimePeriod = currObj["period"].toDateTime();
+            QDateTime currTimePeriodPlus1 = currTimePeriod.addSecs(3600);
+
+            if (currTimePeriod <= tempTime && tempTime < currTimePeriodPlus1) {
+                qDebug() << "INside time";
+                if (tempAge == "0-24 yrs old") {
+                    qDebug() << "add 024";
+                    n0_24++;
+                } else if (tempAge == "25-49 yrs old") {
+                    n25_49++;
+                } else if (tempAge == "50-74 yrs old") {
+                    n50_74++;
+                } else if (tempAge == "75-99 yrs old") {
+                    n75_99++;
+                } else if (tempAge == "100-124 yrs old") {
+                    n100_124++;
+                }
+
+                if (tempGender == "Male") {
+                    nMale++;
+                } else if (tempGender == "Female") {
+                    nFemale++;
+                }
+            }
+
+            qDebug() << "AAAAAAAA notice me";
+            qDebug() << n0_24;
+            output[i]["n0_24"] = n0_24;
+            output[i]["n25_49"] = n25_49;
+            output[i]["n50_74"] = n50_74;
+            output[i]["n75_99"] = n75_99;
+            output[i]["n100_124"] = n100_124;
+
+            output[i]["nMale"] = nMale;
+            output[i]["nFemale"] = nFemale;
+        }
+    }
+
+    qDebug() << dateTimeList[0];
+    qDebug() << legitDateTimeList[0];
+    qDebug() << startPeriod;
+    qDebug() << startDate;
+
+    qDebug() << "Out";
+    qDebug() << output;
+
+//    gender1->append(6, 10);
+//    gender1->append(7, 10);
+//    gender1->append(8, 10);
+//    gender1->append(9, 10);
+//    gender1->append(10, 10);
+//    gender1->append(output[0]["period"].toDateTime().toMSecsSinceEpoch(), 1000);
+//    gender1->clear();
+    for (int i = 0; i < output.size(); ++i) {
+        qDebug("Append idx");
+        qDebug() << i;
+        QDateTime tempDate = output[i]["period"].toDateTime();
+        int tempNFemale = output[i]["nFemale"].toInt();
+        qDebug() << tempDate;
+        qDebug() << tempNFemale;
+
+        gender1->append(tempDate.toMSecsSinceEpoch(), tempNFemale);
+        gender2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["nMale"].toInt());
+
+        chart->scroll(chart->plotArea().width() / 10, 0);
+    }
+}

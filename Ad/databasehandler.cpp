@@ -21,6 +21,7 @@ Databasehandler::~Databasehandler()
 
 void Databasehandler::networkReplyReadyRead()
 {
+    qDebug() << "Ready read";
     qDebug() << m_networkReply->readAll();
 }
 
@@ -44,5 +45,26 @@ void Databasehandler::testWrite() {
     m_networkReply = m_networkManager->post( newpeopleRequest, jsonDoc.toJson() );
     connect(m_networkReply, &QNetworkReply::readyRead, this, &Databasehandler::networkReplyReadyRead);
 
+    qDebug("Test write done");
+}
+
+void Databasehandler::getChartData() {
+    qDebug("Get chart data");
+
+    QJsonObject query, from, collectionId;
+
+    collectionId.insert("collectionId", "people");
+    from.insert("from", collectionId);
+    query.insert("structuredQuery", from);
+
+    QJsonDocument jsonDoc(query);
+    qDebug(jsonDoc.toJson());
+
+    QNetworkRequest newpeopleRequest( QUrl("https://firestore.googleapis.com/v1beta1/projects/intcognito-advertising/databases/(default)/documents:runQuery"));
+    newpeopleRequest.setHeader( QNetworkRequest::ContentTypeHeader, QString("application/json"));
+    m_networkReply = m_networkManager->post( newpeopleRequest, jsonDoc.toJson() );
+    connect(m_networkReply, &QNetworkReply::readyRead, this, &Databasehandler::networkReplyReadyRead);
+
+    qDebug() << m_networkReply->isFinished();
     qDebug("Test write done");
 }

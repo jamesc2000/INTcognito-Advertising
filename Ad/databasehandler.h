@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QString>
 #include <QList>
 
@@ -17,6 +18,7 @@ public:
 public slots:
     void networkReplyReadyRead();
     void testWrite();
+    void getChartData();
 
 signals:
 
