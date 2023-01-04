@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QLineSeries *gender1 = new QLineSeries();
     QLineSeries *gender2 = new QLineSeries();
+    gender1->setName("Female");
+    gender2->setName("Male");
     //Mock Data
     //Data for 0-24
     *gender1 << QPointF(11,1) << QPointF(11,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
@@ -21,14 +23,25 @@ MainWindow::MainWindow(QWidget *parent)
     chart->addSeries(gender1);
     chart->addSeries(gender2);
     chart->createDefaultAxes();
-//    chart->setTitle("example");
+
+//    QDateTimeAxis *axisX = new QDateTimeAxis;
+//    axisX->setTickCount(10);
+//    axisX->setFormat("MMM yyyy");
+//    axisX->setTitleText("Date");
+//    chart->addAxis(axisX, Qt::AlignBottom);
+//    gender1->attachAxis(axisX);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setParent(ui->horizontalFrame);
 
+    //Age Group Chart
     QLineSeries *age1 = new QLineSeries();
-
+//    QLineSeries *age2 = new QLineSeries();
+//    QLineSeries *age3 = new QLineSeries();
+//    QLineSeries *age4 = new QLineSeries();
+//    QLineSeries *age5 = new QLineSeries();
+    age1->setName("0-24 yrs old");
     //mock data
     *age1 << QPointF(11,11) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
 
@@ -42,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     QChartView *chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
-//    chartView->setParent(ui->horizontalFrame);
     chartView2->setParent(ui->horizontalFrame_2);
 
     manager = new QNetworkAccessManager();
