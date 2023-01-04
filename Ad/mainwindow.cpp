@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     gender2->setName("Male");
     //Mock Data
     //Data for 0-24
+    //(timestamp,y axis)
     *gender1 << QPointF(11,1) << QPointF(11,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
     *gender2 << QPointF(11,3) << QPointF(10,3) << QPointF(17,4) << QPointF(11,3)<< QPointF(10,2);
 
@@ -37,19 +38,33 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Age Group Chart
     QLineSeries *age1 = new QLineSeries();
-//    QLineSeries *age2 = new QLineSeries();
-//    QLineSeries *age3 = new QLineSeries();
-//    QLineSeries *age4 = new QLineSeries();
-//    QLineSeries *age5 = new QLineSeries();
+    QLineSeries *age2 = new QLineSeries();
+    QLineSeries *age3 = new QLineSeries();
+    QLineSeries *age4 = new QLineSeries();
+    QLineSeries *age5 = new QLineSeries();
     age1->setName("0-24 yrs old");
+    age2->setName("25-49 yrs old");
+    age3->setName("50-74 yrs old");
+    age4->setName("75-99 yrs old");
+    age5->setName("100-124 yrs old");
+
+
     //mock data
     *age1 << QPointF(11,11) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+    *age2 << QPointF(11,12) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+    *age3 << QPointF(11,13) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+    *age4 << QPointF(11,14) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
+    *age5 << QPointF(11,10) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
 
     QChart *chart2 = new QChart();
     //chart->legend()->hide();
     chart2->legend()->setVisible(true);
     chart2->legend()->setAlignment(Qt::AlignBottom);
     chart2->addSeries(age1);
+    chart2->addSeries(age2);
+    chart2->addSeries(age3);
+    chart2->addSeries(age4);
+    chart2->addSeries(age5);
     chart2->createDefaultAxes();
     chart2->setTitle("example");
 
