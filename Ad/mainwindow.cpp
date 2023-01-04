@@ -13,9 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
     gender2->setName("Male");
     //Mock Data
     //Data for 0-24
-    //(timestamp,y axis)
-    *gender1 << QPointF(11,1) << QPointF(11,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
-    *gender2 << QPointF(11,3) << QPointF(10,3) << QPointF(17,4) << QPointF(11,3)<< QPointF(10,2);
+    //(timestamp,y axis
+
+
+
+    *gender1 << QPointF(1,2) << QPointF(2,3) << QPointF(3,6) << QPointF(4,3)<< QPointF(5,2);
+    *gender2 << QPointF(3,1); /*<< QPointF(axisX,3) << QPointF(axisX,6) << QPointF(axisX,3)<< QPointF(axisX,2);*/
 
     QChart *chart = new QChart();
     chart->legend()->setVisible(true);
@@ -23,14 +26,23 @@ MainWindow::MainWindow(QWidget *parent)
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->addSeries(gender1);
     chart->addSeries(gender2);
-    chart->createDefaultAxes();
+//    chart->createDefaultAxes();
 
-//    QDateTimeAxis *axisX = new QDateTimeAxis;
-//    axisX->setTickCount(10);
-//    axisX->setFormat("MMM yyyy");
-//    axisX->setTitleText("Date");
-//    chart->addAxis(axisX, Qt::AlignBottom);
-//    gender1->attachAxis(axisX);
+    QDateTimeAxis *axisX = new QDateTimeAxis;
+    axisX->setTickCount(10);
+    axisX->setFormat("MMM yyyy");
+    axisX->setTitleText("Date");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    gender1->attachAxis(axisX);
+    gender2->attachAxis(axisX);
+
+    QDateTime hourly = QDateTime::fromString("January 4 2023");
+    QValueAxis *axisY = new QValueAxis;
+    axisY->setTitleText("numbers");
+    axisY->setTickCount(10);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    gender1->attachAxis(axisY);
+    gender2->attachAxis(axisY);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);

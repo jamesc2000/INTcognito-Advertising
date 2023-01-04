@@ -9,6 +9,9 @@
 #include <QList>
 #include <QString>
 #include <QCheckBox>
+#include <QDateTime>
+#include <QDateTimeAxis>
+#include <QValueAxis>
 
 #include <QNetworkRequest>
 #include <QNetworkReply>
