@@ -6,6 +6,7 @@
 #include <QtCharts>
 #include <QChartView>
 #include <QLineSeries>
+#include <QChart>
 #include <QList>
 #include <QString>
 #include <QCheckBox>
@@ -52,6 +53,7 @@ private:
     QNetworkReply * windowNetworkReply2;
     void uploadAd(QString adName, QList<QString> ageGroups, QList<QString> genders, QString imageUrl);
     void getChartData();
+    void testChart();
 
     QLineSeries *gender1;
     QLineSeries *gender2;
@@ -64,5 +66,8 @@ private:
 
     QChart *chart;
     QChart *chart2;
+
+    QChartView *chartView;
+    QChartView *chartView2;
 };
 #endif // MAINWINDOW_H

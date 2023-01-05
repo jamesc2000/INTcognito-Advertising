@@ -18,6 +18,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 //    *gender1 << QPointF(1,2) << QPointF(2,3) << QPointF(3,6) << QPointF(4,3)<< QPointF(5,2);
+//    *gender1 << QPointF(QDateTime::currentDateTime().toMSecsSinceEpoch(),2)
+//             << QPointF(QDateTime::currentDateTime().addDays(1).toMSecsSinceEpoch(),3)
+//             << QPointF(QDateTime::currentDateTime().addDays(2).toMSecsSinceEpoch(),6)
+//             << QPointF(QDateTime::currentDateTime().addDays(3).toMSecsSinceEpoch(),3)
+//             << QPointF(QDateTime::currentDateTime().addDays(4).toMSecsSinceEpoch(),2);
+
+//    *gender1 << QPointF(QDateTime::currentDateTime().addDays(5).toMSecsSinceEpoch(),10);
 //    *gender1 << QPointF(10000000, 100) << QPointF(10000000, 100) << QPointF(10000000, 100);
 //    *gender2 << QPointF(3,1); /*<< QPointF(axisX,3) << QPointF(axisX,6) << QPointF(axisX,3)<< QPointF(axisX,2);*/
 
@@ -27,13 +34,12 @@ MainWindow::MainWindow(QWidget *parent)
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->addSeries(gender1);
     chart->addSeries(gender2);
-//    chart->createDefaultAxes();
 
     QDateTimeAxis *axisX = new QDateTimeAxis;
-    axisX->setTickCount(5);
-    axisX->setFormat("MMM dd | hh ap");
+    axisX->setTickCount(6);
+    axisX->setFormat("hh ap");
     axisX->setTitleText("Date");
-    chart->addAxis(axisX, Qt::AlignBottom);
+//    chart->addAxis(axisX, Qt::AlignBottom);
     gender1->attachAxis(axisX);
     gender2->attachAxis(axisX);
 
@@ -42,13 +48,17 @@ MainWindow::MainWindow(QWidget *parent)
     axisY->setTickCount(10);
     axisY->setMax(10);
     axisY->setMin(0);
-    chart->addAxis(axisY, Qt::AlignLeft);
+//    chart->addAxis(axisY, Qt::AlignLeft);
     gender1->attachAxis(axisY);
     gender2->attachAxis(axisY);
 
-    QChartView *chartView = new QChartView(chart);
+    chartView = new QChartView();
+    chartView->setChart(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setParent(ui->horizontalFrame);
+    qDebug() << chartView;
+
+//    testChart();
 
     //Age Group Chart
     age1 = new QLineSeries();
@@ -84,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
     axisX2->setTickCount(5);
     axisX2->setFormat("MMM dd | hh ap");
     axisX2->setTitleText("Date");
-    chart2->addAxis(axisX2, Qt::AlignBottom);
+//    chart2->addAxis(axisX2, Qt::AlignBottom);
     age1->attachAxis(axisX2);
     age2->attachAxis(axisX2);
     age3->attachAxis(axisX2);
@@ -96,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
     axisY2->setTickCount(10);
     axisY2->setMax(10);
     axisY2->setMin(0);
-    chart2->addAxis(axisY2, Qt::AlignLeft);
+//    chart2->addAxis(axisY2, Qt::AlignLeft);
     age1->attachAxis(axisY2);
     age2->attachAxis(axisY2);
     age3->attachAxis(axisY2);
@@ -105,7 +115,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    QChartView *chartView2 = new QChartView(chart2);
+    chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
     chartView2->setParent(ui->horizontalFrame_2);
 
@@ -115,6 +125,18 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete manager;
+}
+
+void MainWindow::testChart() {
+//    *gender1 << QPointF(QDateTime::currentDateTime().toMSecsSinceEpoch(),2)
+//             << QPointF(QDateTime::currentDateTime().addDays(1).toMSecsSinceEpoch(),3);
+//             << QPointF(QDateTime::currentDateTime().addDays(2).toMSecsSinceEpoch(),6)
+//             << QPointF(QDateTime::currentDateTime().addDays(3).toMSecsSinceEpoch(),3)
+//             << QPointF(QDateTime::currentDateTime().addDays(4).toMSecsSinceEpoch(),2);
+    gender1->append(QDateTime::currentDateTime().toMSecsSinceEpoch(),2);
+    gender2->append(QDateTime::currentDateTime().toMSecsSinceEpoch(),2);
+    qDebug() << chartView;
+    chartView->update();
 }
 
 void MainWindow::showEvent(QShowEvent *ev) {
@@ -255,10 +277,17 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::getChartData() {
     qDebug("Get chart data");
 
-    QJsonObject query, from, collectionId;
+    QJsonObject query, from, collectionId, orderBy, orderByField, orderByDirection;
 
     collectionId.insert("collectionId", "counts");
     from.insert("from", collectionId);
+
+    orderByField.insert("fieldPath", "Time");
+    orderBy.insert("field", orderByField);
+    orderBy.insert("direction", "ASCENDING");
+
+    from.insert("orderBy", orderBy);
+
     query.insert("structuredQuery", from);
 
     QJsonDocument jsonDoc(query);
@@ -359,6 +388,23 @@ void MainWindow::onChartResponse() {
     int nMale;
     int nFemale;
 
+    chart->removeSeries(gender1);
+    chart->removeSeries(gender2);
+    gender1 = new QLineSeries;
+    gender2 = new QLineSeries;
+
+    chart2->removeSeries(age1);
+    chart2->removeSeries(age2);
+    chart2->removeSeries(age3);
+    chart2->removeSeries(age4);
+    chart2->removeSeries(age5);
+
+    age1 = new QLineSeries;
+    age2 = new QLineSeries;
+    age3 = new QLineSeries;
+    age4 = new QLineSeries;
+    age5 = new QLineSeries;
+
     for (int i = 0; i < object.size(); ++i) {
         QJsonValue arrEl = object[i];
         // QString tempAge, tempGender;
@@ -377,125 +423,84 @@ void MainWindow::onChartResponse() {
         QJsonObject tempFields = arrEl.toObject().value("document")
                                     .toObject().value("fields").toObject();
 
-        n0_24 = tempFields.value("n0_24").toObject().value("integerValue").toInt();
-        n25_49 = tempFields.value("n25_49").toObject().value("integerValue").toInt();
-        n50_74 = tempFields.value("n50_74").toObject().value("integerValue").toInt();
-        n75_99 = tempFields.value("n75_99").toObject().value("integerValue").toInt();
-        n100_124 = tempFields.value("n100_1").toObject().value("integerValue").toInt();
+        n0_24 = tempFields.value("n0_24").toObject().value("integerValue").toString().toInt();
+        n25_49 = tempFields.value("n25_49").toObject().value("integerValue").toString().toInt();
+        n50_74 = tempFields.value("n50_74").toObject().value("integerValue").toString().toInt();
+        n75_99 = tempFields.value("n75_99").toObject().value("integerValue").toString().toInt();
+        n100_124 = tempFields.value("n100_1").toObject().value("integerValue").toString().toInt();
 
-        nMale = tempFields.value("nMale").toObject().value("integerValue").toInt();
-        nFemale = tempFields.value("nFemale").toObject().value("integerValue").toInt();
+        nMale = tempFields.value("nMale").toObject().value("integerValue").toString().toInt();
+        nFemale = tempFields.value("nFemale").toObject().value("integerValue").toString().toInt();
 
         QDateTime tempTime = QDateTime::fromString(arrEl.toObject().value("document")
                     .toObject().value("fields")
                     .toObject().value("Time")
                     .toObject().value("timestampValue").toString(), Qt::ISODate);
 
-//        gender1->append(tempTime, nFemale);
-//        gender2->append(tempTime, nMale);
+        qDebug() << tempTime << " | " << nFemale;
+        *gender1 << QPointF(tempTime.toMSecsSinceEpoch(), nFemale);
+        *gender2 << QPointF(tempTime.toMSecsSinceEpoch(), nMale);
 
-//        age3->append(tempTime, n0_24);
-//        age4->append(tempTime, n25_49);
-//        age2->append(tempTime, n50_74);
-//        age1->append(tempTime, n75_99);
-//        age5->append(tempTime, n100_124);
-
-//        chart->scroll(chart->plotArea().width() / 10, 0);
-
-        // for (int i = 0; i < output.size(); ++i) {
-        //     int n0_24 = tempFields.value("n0_24").toObject().value("integerValue").toInt();
-        //     int n25_49 = tempFields.value("n25_49").toObject().value("integerValue").toInt();
-        //     int n50_74 = tempFields.value("n50_74").toObject().value("integerValue").toInt();
-        //     int n75_99 = tempFields.value("n75_99").toObject().value("integerValue").toInt();
-        //     int n100_124 = tempFields.value("n100_1").toObject().value("integerValue").toInt();
-
-        //     int nMale = tempFields.value("nMale").toObject().value("stringValue").toString();
-        //     int nFemale = tempFields.value("nFemale").toObject().value("integerValue").toString();
-
-
-
-            // QVariantMap currObj = output[i];
-            // QDateTime currTimePeriod = currObj["period"].toDateTime();
-            // QDateTime currTimePeriodPlus1 = currTimePeriod.addSecs(3600);
-
-            // if (currTimePeriod <= tempTime && tempTime < currTimePeriodPlus1) {
-            //     qDebug() << "INside time";
-            //     if (tempAge == "0-24 yrs old") {
-            //         qDebug() << "add 024";
-            //         n0_24++;
-            //     } else if (tempAge == "25-49 yrs old") {
-            //         n25_49++;
-            //     } else if (tempAge == "50-74 yrs old") {
-            //         n50_74++;
-            //     } else if (tempAge == "75-99 yrs old") {
-            //         n75_99++;
-            //     } else if (tempAge == "100-124 yrs old") {
-            //         n100_124++;
-            //     }
-
-            //     if (tempGender == "Male") {
-            //         nMale++;
-            //     } else if (tempGender == "Female") {
-            //         nFemale++;
-            //     }
-            // }
-
-            // qDebug() << "AAAAAAAA notice me";
-            // qDebug() << n0_24;
-            // output[i]["n0_24"] = n0_24;
-            // output[i]["n25_49"] = n25_49;
-            // output[i]["n50_74"] = n50_74;
-            // output[i]["n75_99"] = n75_99;
-            // output[i]["n100_124"] = n100_124;
-
-            // output[i]["nMale"] = nMale;
-            // output[i]["nFemale"] = nFemale;
-    //     }
+        *age1 << QPointF(tempTime.toMSecsSinceEpoch(), n0_24);
+        *age2 << QPointF(tempTime.toMSecsSinceEpoch(), n25_49);
+        *age3 << QPointF(tempTime.toMSecsSinceEpoch(), n50_74);
+        *age4 << QPointF(tempTime.toMSecsSinceEpoch(), n75_99);
+        *age5 << QPointF(tempTime.toMSecsSinceEpoch(), n100_124);
     }
 
-    // qDebug() << dateTimeList[0];
-    // qDebug() << legitDateTimeList[0];
-    // qDebug() << startPeriod;
-    // qDebug() << startDate;
+    gender1->setName("Female");
+    gender2->setName("Male");
+    chart->addSeries(gender1);
+    chart->addSeries(gender2);
 
-    // qDebug() << "Out";
-    // qDebug() << output;
+    QDateTimeAxis *axisX = new QDateTimeAxis;
+    axisX->setTickCount(6);
+    axisX->setFormat("hh ap");
+    axisX->setTitleText("Date");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    gender1->attachAxis(axisX);
+    gender2->attachAxis(axisX);
 
-    // int maxGender = 0;
-    // for (int i = 0; i < output.size(); ++i) {
-    //     QDateTime tempDate = output[i]["period"].toDateTime();
-    //     int tempNFemale = output[i]["nFemale"].toInt();
-    //     qDebug() << tempDate;
-    //     qDebug() << tempNFemale;
+    QValueAxis *axisY = new QValueAxis;
+    axisY->setTitleText("Number");
+    axisY->setTickCount(10);
+    axisY->setMax(10);
+    axisY->setMin(0);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    gender1->attachAxis(axisY);
+    gender2->attachAxis(axisY);
 
-    //     gender1->append(tempDate.toMSecsSinceEpoch(), tempNFemale);
-    //     gender2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["nMale"].toInt());
+    age1->setName("0-24 yrs old");
+    age2->setName("25-49 yrs old");
+    age3->setName("50-74 yrs old");
+    age4->setName("75-99 yrs old");
+    age5->setName("100-124 yrs old");
+    chart2->addSeries(age1);
+    chart2->addSeries(age2);
+    chart2->addSeries(age3);
+    chart2->addSeries(age4);
+    chart2->addSeries(age5);
 
-    //     if (output[i]["nMale"].toInt() > 0) {
-    //         qDebug() << "Add male to chart " << output[i];
-    //     }
+    QDateTimeAxis *axisX2 = new QDateTimeAxis;
+    axisX2->setTickCount(5);
+    axisX2->setFormat("MMM dd | hh ap");
+    axisX2->setTitleText("Date");
+    chart2->addAxis(axisX2, Qt::AlignBottom);
+    age1->attachAxis(axisX2);
+    age2->attachAxis(axisX2);
+    age3->attachAxis(axisX2);
+    age4->attachAxis(axisX2);
+    age5->attachAxis(axisX2);
 
-    //     if (output[i]["nFemale"].toInt() > 0) {
-    //         qDebug() << "Add female to chart " << output[i];
-    //     }
-
-    //     age1->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n0_24"].toInt());
-    //     age2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n25_49"].toInt());
-    //     age3->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n50_74"].toInt());
-    //     age4->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n75_99"].toInt());
-    //     age5->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n100_124"].toInt());
-
-    //     if (output[i]["nFemale"].toInt() > maxGender) {
-    //         maxGender = output[i]["nFemale"].toInt();
-    //     }
-
-    //     if (output[i]["nMale"].toInt() > maxGender) {
-    //         maxGender = output[i]["nMale"].toInt();
-    //     }
-
-    //     chart->scroll(chart->plotArea().width() / 10, 0);
-    // }
-    // qDebug() << "Last appended";
-    // qDebug() << output.last()["period"] << " " << output.last()["nFemale"] << " " << output.last()["nMale"];
-
+    QValueAxis *axisY2 = new QValueAxis;
+    axisY2->setTitleText("Number");
+    axisY2->setTickCount(10);
+    axisY2->setMax(10);
+    axisY2->setMin(0);
+    chart2->addAxis(axisY2, Qt::AlignLeft);
+    age1->attachAxis(axisY2);
+    age2->attachAxis(axisY2);
+    age3->attachAxis(axisY2);
+    age4->attachAxis(axisY2);
+    age5->attachAxis(axisY2);
 }
