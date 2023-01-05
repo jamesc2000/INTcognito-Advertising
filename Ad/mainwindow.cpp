@@ -71,16 +71,39 @@ MainWindow::MainWindow(QWidget *parent)
     *age5 << QPointF(11,10) << QPointF(13,3) << QPointF(17,6) << QPointF(18,3)<< QPointF(20,2);
 
     chart2 = new QChart();
-    //chart->legend()->hide();
     chart2->legend()->setVisible(true);
     chart2->legend()->setAlignment(Qt::AlignBottom);
+    chart->setAnimationOptions(QChart::AllAnimations);
     chart2->addSeries(age1);
     chart2->addSeries(age2);
     chart2->addSeries(age3);
     chart2->addSeries(age4);
     chart2->addSeries(age5);
-    chart2->createDefaultAxes();
-    chart2->setTitle("example");
+
+    QDateTimeAxis *axisX2 = new QDateTimeAxis;
+    axisX2->setTickCount(5);
+    axisX2->setFormat("MMM dd | hh ap");
+    axisX2->setTitleText("Date");
+    chart2->addAxis(axisX2, Qt::AlignBottom);
+    age1->attachAxis(axisX2);
+    age2->attachAxis(axisX2);
+    age3->attachAxis(axisX2);
+    age4->attachAxis(axisX2);
+    age5->attachAxis(axisX2);
+
+    QValueAxis *axisY2 = new QValueAxis;
+    axisY2->setTitleText("Number");
+    axisY2->setTickCount(10);
+    axisY2->setMax(10);
+    axisY2->setMin(0);
+    chart2->addAxis(axisY2, Qt::AlignLeft);
+    age1->attachAxis(axisY2);
+    age2->attachAxis(axisY2);
+    age3->attachAxis(axisY2);
+    age4->attachAxis(axisY2);
+    age5->attachAxis(axisY2);
+
+
 
     QChartView *chartView2 = new QChartView(chart2);
     chartView2->setRenderHint(QPainter::Antialiasing);
