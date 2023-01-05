@@ -234,7 +234,7 @@ void MainWindow::getChartData() {
 
     QJsonObject query, from, collectionId;
 
-    collectionId.insert("collectionId", "people");
+    collectionId.insert("collectionId", "counts");
     from.insert("from", collectionId);
     query.insert("structuredQuery", from);
 
@@ -262,6 +262,10 @@ void MainWindow::onChartResponse() {
 
     QJsonArray object = resDoc.array();
 
+    qDebug() << "Object value\n";
+    qDebug() << object;
+
+
     QList<QString> dateTimeList;
     foreach (const QJsonValue& arrEl, object) {
         QString tempTime;
@@ -274,6 +278,7 @@ void MainWindow::onChartResponse() {
 
     }
 
+    qDebug() << "281 after foreach";
     QList<QVariantMap> output;
 
     // [{period: DateTime, maleCount: int, femaleCount, n0_24, etc etc}, ...]
@@ -289,9 +294,12 @@ void MainWindow::onChartResponse() {
 
     for (int i = 0; i < dateTimeList.size(); ++i) {
         qDebug() << dateTimeList[i];
-        legitDateTimeList.append(QDateTime::fromString(dateTimeList[i], Qt::ISODate));
+        if (!dateTimeList[i].isEmpty()) {
+            legitDateTimeList.append(QDateTime::fromString(dateTimeList[i], Qt::ISODate));
+        }
     }
 
+    qDebug() << "300 after for loop";
     QDate startDate = legitDateTimeList[0].date();
     QTime startTime = legitDateTimeList[0].time();
     startTime.setHMS(startTime.hour(), 0, 0);
@@ -308,133 +316,163 @@ void MainWindow::onChartResponse() {
     endPeriod.setDate(endDate);
     endPeriod.setTime(endTime);
 
+    qDebug() << "317 before for loop";
+    qDebug() << startPeriod;
+    qDebug() << legitDateTimeList[0];
+    qDebug() << dateTimeList[0];
     for (QDateTime dt = startPeriod; dt < endPeriod; dt = dt.addSecs(3600)) {
         QVariantMap temp;
         temp["period"] = dt;
+        qDebug() << temp;
         output.append(temp);
     }
 
-    int n0_24 = 0;
-    int n25_49 = 0;
-    int n50_74 = 0;
-    int n75_99 = 0;
-    int n100_124 = 0;
+    int n0_24;
+    int n25_49;
+    int n50_74;
+    int n75_99;
+    int n100_124;
 
-    int nMale = 0;
-    int nFemale = 0;
+    int nMale;
+    int nFemale;
 
+    for (int i = 0; i < object.size(); ++i) {
+        QJsonValue arrEl = object[i];
+        // QString tempAge, tempGender;
+        // QDateTime tempTime;
 
-    foreach (const QJsonValue& arrEl, object) {
-        QString tempAge, tempGender;
-        QDateTime tempTime;
+        // tempAge = arrEl.toObject().value("document")
+        //             .toObject().value("fields")
+        //             .toObject().value("Age")
+        //             .toObject().value("stringValue").toString();
 
-        tempAge = arrEl.toObject().value("document")
-                    .toObject().value("fields")
-                    .toObject().value("Age")
-                    .toObject().value("stringValue").toString();
+        // tempGender = arrEl.toObject().value("document")
+        //             .toObject().value("fields")
+        //             .toObject().value("Gender")
+        //             .toObject().value("stringValue").toString();
 
-        tempGender = arrEl.toObject().value("document")
-                    .toObject().value("fields")
-                    .toObject().value("Gender")
-                    .toObject().value("stringValue").toString();
+        QJsonObject tempFields = arrEl.toObject().value("document")
+                                    .toObject().value("fields").toObject();
 
-        tempTime = QDateTime::fromString(arrEl.toObject().value("document")
+        n0_24 = tempFields.value("n0_24").toObject().value("integerValue").toInt();
+        n25_49 = tempFields.value("n25_49").toObject().value("integerValue").toInt();
+        n50_74 = tempFields.value("n50_74").toObject().value("integerValue").toInt();
+        n75_99 = tempFields.value("n75_99").toObject().value("integerValue").toInt();
+        n100_124 = tempFields.value("n100_1").toObject().value("integerValue").toInt();
+
+        nMale = tempFields.value("nMale").toObject().value("integerValue").toInt();
+        nFemale = tempFields.value("nFemale").toObject().value("integerValue").toInt();
+
+        QDateTime tempTime = QDateTime::fromString(arrEl.toObject().value("document")
                     .toObject().value("fields")
                     .toObject().value("Time")
                     .toObject().value("timestampValue").toString(), Qt::ISODate);
 
-        for (int i = 0; i < output.size(); ++i) {
-            n0_24 = 0;
-            n25_49 = 0;
-            n50_74 = 0;
-            n75_99 = 0;
-            n100_124 = 0;
+//        gender1->append(tempTime, nFemale);
+//        gender2->append(tempTime, nMale);
 
-            nMale = 0;
-            nFemale = 0;
+//        age3->append(tempTime, n0_24);
+//        age4->append(tempTime, n25_49);
+//        age2->append(tempTime, n50_74);
+//        age1->append(tempTime, n75_99);
+//        age5->append(tempTime, n100_124);
 
-            QVariantMap currObj = output[i];
-            QDateTime currTimePeriod = currObj["period"].toDateTime();
-            QDateTime currTimePeriodPlus1 = currTimePeriod.addSecs(3600);
+//        chart->scroll(chart->plotArea().width() / 10, 0);
 
-            if (currTimePeriod <= tempTime && tempTime < currTimePeriodPlus1) {
-                qDebug() << "INside time";
-                if (tempAge == "0-24 yrs old") {
-                    qDebug() << "add 024";
-                    n0_24++;
-                } else if (tempAge == "25-49 yrs old") {
-                    n25_49++;
-                } else if (tempAge == "50-74 yrs old") {
-                    n50_74++;
-                } else if (tempAge == "75-99 yrs old") {
-                    n75_99++;
-                } else if (tempAge == "100-124 yrs old") {
-                    n100_124++;
-                }
+        // for (int i = 0; i < output.size(); ++i) {
+        //     int n0_24 = tempFields.value("n0_24").toObject().value("integerValue").toInt();
+        //     int n25_49 = tempFields.value("n25_49").toObject().value("integerValue").toInt();
+        //     int n50_74 = tempFields.value("n50_74").toObject().value("integerValue").toInt();
+        //     int n75_99 = tempFields.value("n75_99").toObject().value("integerValue").toInt();
+        //     int n100_124 = tempFields.value("n100_1").toObject().value("integerValue").toInt();
 
-                if (tempGender == "Male") {
-                    nMale++;
-                } else if (tempGender == "Female") {
-                    nFemale++;
-                }
-            }
+        //     int nMale = tempFields.value("nMale").toObject().value("stringValue").toString();
+        //     int nFemale = tempFields.value("nFemale").toObject().value("integerValue").toString();
 
-            qDebug() << "AAAAAAAA notice me";
-            qDebug() << n0_24;
-            output[i]["n0_24"] = n0_24;
-            output[i]["n25_49"] = n25_49;
-            output[i]["n50_74"] = n50_74;
-            output[i]["n75_99"] = n75_99;
-            output[i]["n100_124"] = n100_124;
 
-            output[i]["nMale"] = nMale;
-            output[i]["nFemale"] = nFemale;
-        }
+
+            // QVariantMap currObj = output[i];
+            // QDateTime currTimePeriod = currObj["period"].toDateTime();
+            // QDateTime currTimePeriodPlus1 = currTimePeriod.addSecs(3600);
+
+            // if (currTimePeriod <= tempTime && tempTime < currTimePeriodPlus1) {
+            //     qDebug() << "INside time";
+            //     if (tempAge == "0-24 yrs old") {
+            //         qDebug() << "add 024";
+            //         n0_24++;
+            //     } else if (tempAge == "25-49 yrs old") {
+            //         n25_49++;
+            //     } else if (tempAge == "50-74 yrs old") {
+            //         n50_74++;
+            //     } else if (tempAge == "75-99 yrs old") {
+            //         n75_99++;
+            //     } else if (tempAge == "100-124 yrs old") {
+            //         n100_124++;
+            //     }
+
+            //     if (tempGender == "Male") {
+            //         nMale++;
+            //     } else if (tempGender == "Female") {
+            //         nFemale++;
+            //     }
+            // }
+
+            // qDebug() << "AAAAAAAA notice me";
+            // qDebug() << n0_24;
+            // output[i]["n0_24"] = n0_24;
+            // output[i]["n25_49"] = n25_49;
+            // output[i]["n50_74"] = n50_74;
+            // output[i]["n75_99"] = n75_99;
+            // output[i]["n100_124"] = n100_124;
+
+            // output[i]["nMale"] = nMale;
+            // output[i]["nFemale"] = nFemale;
+    //     }
     }
 
-    qDebug() << dateTimeList[0];
-    qDebug() << legitDateTimeList[0];
-    qDebug() << startPeriod;
-    qDebug() << startDate;
+    // qDebug() << dateTimeList[0];
+    // qDebug() << legitDateTimeList[0];
+    // qDebug() << startPeriod;
+    // qDebug() << startDate;
 
-    qDebug() << "Out";
-    qDebug() << output;
+    // qDebug() << "Out";
+    // qDebug() << output;
 
-    int maxGender = 0;
-    for (int i = 0; i < output.size(); ++i) {
-        QDateTime tempDate = output[i]["period"].toDateTime();
-        int tempNFemale = output[i]["nFemale"].toInt();
-        qDebug() << tempDate;
-        qDebug() << tempNFemale;
+    // int maxGender = 0;
+    // for (int i = 0; i < output.size(); ++i) {
+    //     QDateTime tempDate = output[i]["period"].toDateTime();
+    //     int tempNFemale = output[i]["nFemale"].toInt();
+    //     qDebug() << tempDate;
+    //     qDebug() << tempNFemale;
 
-        gender1->append(tempDate.toMSecsSinceEpoch(), tempNFemale);
-        gender2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["nMale"].toInt());
+    //     gender1->append(tempDate.toMSecsSinceEpoch(), tempNFemale);
+    //     gender2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["nMale"].toInt());
 
-        if (output[i]["nMale"].toInt() > 0) {
-            qDebug() << "Add male to chart " << output[i];
-        }
+    //     if (output[i]["nMale"].toInt() > 0) {
+    //         qDebug() << "Add male to chart " << output[i];
+    //     }
 
-        if (output[i]["nFemale"].toInt() > 0) {
-            qDebug() << "Add female to chart " << output[i];
-        }
+    //     if (output[i]["nFemale"].toInt() > 0) {
+    //         qDebug() << "Add female to chart " << output[i];
+    //     }
 
-        age1->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n0_24"].toInt());
-        age2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n25_49"].toInt());
-        age3->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n50_74"].toInt());
-        age4->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n75_99"].toInt());
-        age5->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n100_124"].toInt());
+    //     age1->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n0_24"].toInt());
+    //     age2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n25_49"].toInt());
+    //     age3->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n50_74"].toInt());
+    //     age4->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n75_99"].toInt());
+    //     age5->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n100_124"].toInt());
 
-        if (output[i]["nFemale"].toInt() > maxGender) {
-            maxGender = output[i]["nFemale"].toInt();
-        }
+    //     if (output[i]["nFemale"].toInt() > maxGender) {
+    //         maxGender = output[i]["nFemale"].toInt();
+    //     }
 
-        if (output[i]["nMale"].toInt() > maxGender) {
-            maxGender = output[i]["nMale"].toInt();
-        }
+    //     if (output[i]["nMale"].toInt() > maxGender) {
+    //         maxGender = output[i]["nMale"].toInt();
+    //     }
 
-        chart->scroll(chart->plotArea().width() / 10, 0);
-    }
-    qDebug() << "Last appended";
-    qDebug() << output.last()["period"] << " " << output.last()["nFemale"] << " " << output.last()["nMale"];
+    //     chart->scroll(chart->plotArea().width() / 10, 0);
+    // }
+    // qDebug() << "Last appended";
+    // qDebug() << output.last()["period"] << " " << output.last()["nFemale"] << " " << output.last()["nMale"];
 
 }

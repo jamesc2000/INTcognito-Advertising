@@ -73,3 +73,4 @@ CMakeLists.txt.user*
 *.exe
 
 build-Ad-Desktop_x86_windows_msvc2022_pe_64bit-Debug
+build-Ad-Desktop_Qt_6_4_1_MinGW_64_bit-Debug
