@@ -7,11 +7,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    manager = new QNetworkAccessManager();
-    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(managerFinished(QNetworkReply*)));
-
-    getChartData();
-
     gender1 = new QLineSeries();
     gender2 = new QLineSeries();
 
@@ -22,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     //(timestamp,y axis
 
 
-    *gender1 << QPointF(1,2) << QPointF(2,3) << QPointF(3,6) << QPointF(4,3)<< QPointF(5,2);
+//    *gender1 << QPointF(1,2) << QPointF(2,3) << QPointF(3,6) << QPointF(4,3)<< QPointF(5,2);
 //    *gender1 << QPointF(10000000, 100) << QPointF(10000000, 100) << QPointF(10000000, 100);
 //    *gender2 << QPointF(3,1); /*<< QPointF(axisX,3) << QPointF(axisX,6) << QPointF(axisX,3)<< QPointF(axisX,2);*/
 
@@ -35,16 +30,18 @@ MainWindow::MainWindow(QWidget *parent)
 //    chart->createDefaultAxes();
 
     QDateTimeAxis *axisX = new QDateTimeAxis;
-    axisX->setTickCount(10);
-    axisX->setFormat("dd hh");
+    axisX->setTickCount(5);
+    axisX->setFormat("MMM dd | hh ap");
     axisX->setTitleText("Date");
     chart->addAxis(axisX, Qt::AlignBottom);
     gender1->attachAxis(axisX);
     gender2->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis;
-    axisY->setTitleText("numbers");
+    axisY->setTitleText("Number");
     axisY->setTickCount(10);
+    axisY->setMax(10);
+    axisY->setMin(0);
     chart->addAxis(axisY, Qt::AlignLeft);
     gender1->attachAxis(axisY);
     gender2->attachAxis(axisY);
@@ -97,6 +94,16 @@ MainWindow::~MainWindow()
     delete manager;
 }
 
+void MainWindow::showEvent(QShowEvent *ev) {
+    QMainWindow::showEvent(ev);
+    qDebug() << "Window shown";
+    manager = new QNetworkAccessManager();
+    manager2 = new QNetworkAccessManager();
+//    QObject::connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(managerFinished(QNetworkReply*)));
+
+    getChartData();
+}
+
 void MainWindow::managerFinished(QNetworkReply *reply) {
     if (reply->error()) {
         qDebug() << reply->errorString();
@@ -105,6 +112,7 @@ void MainWindow::managerFinished(QNetworkReply *reply) {
 
     QString answer = reply->readAll();
     qDebug() << answer;
+
 }
 
 void MainWindow::uploadAd(
@@ -231,17 +239,26 @@ void MainWindow::getChartData() {
     query.insert("structuredQuery", from);
 
     QJsonDocument jsonDoc(query);
-    qDebug(jsonDoc.toJson());
+    qDebug() << jsonDoc.toJson();
 
     QNetworkRequest newpeopleRequest( QUrl("https://firestore.googleapis.com/v1beta1/projects/intcognito-advertising/databases/(default)/documents:runQuery"));
     newpeopleRequest.setHeader( QNetworkRequest::ContentTypeHeader, QString("application/json"));
-    m_networkReply = manager->post( newpeopleRequest, jsonDoc.toJson() );
-    connect(m_networkReply, &QNetworkReply::readyRead, this, &MainWindow::onChartResponse);
+    windowNetworkReply2 = manager2->post( newpeopleRequest, jsonDoc.toJson() );
+    // No such signal finished for networkReply
+    QObject::connect(manager2, SIGNAL(finished(QNetworkReply*)), this, SLOT(onChartResponse()), Qt::QueuedConnection);
 }
 
 void MainWindow::onChartResponse() {
+    qDebug() << "chart response";
+    QByteArray rawResponse = windowNetworkReply2->readAll();
+    qDebug() << rawResponse;
     QJsonDocument resDoc;
-    resDoc = QJsonDocument::fromJson(m_networkReply->readAll());
+    QJsonParseError jsonErr;
+    resDoc = QJsonDocument::fromJson(rawResponse, &jsonErr);
+
+    if (jsonErr.error != QJsonParseError::NoError){
+        qDebug() << jsonErr.errorString();
+    }
 
     QJsonArray object = resDoc.array();
 
@@ -284,7 +301,7 @@ void MainWindow::onChartResponse() {
     startPeriod.setTime(startTime);
 
     QDate endDate = legitDateTimeList.last().date();
-    QTime endTime = legitDateTimeList.last().time();
+    QTime endTime = legitDateTimeList.last().time().addSecs(3600*10);
     endTime.setHMS(endTime.hour(), 0, 0);
 
     QDateTime endPeriod;
@@ -383,16 +400,8 @@ void MainWindow::onChartResponse() {
     qDebug() << "Out";
     qDebug() << output;
 
-//    gender1->append(6, 10);
-//    gender1->append(7, 10);
-//    gender1->append(8, 10);
-//    gender1->append(9, 10);
-//    gender1->append(10, 10);
-//    gender1->append(output[0]["period"].toDateTime().toMSecsSinceEpoch(), 1000);
-//    gender1->clear();
+    int maxGender = 0;
     for (int i = 0; i < output.size(); ++i) {
-        qDebug("Append idx");
-        qDebug() << i;
         QDateTime tempDate = output[i]["period"].toDateTime();
         int tempNFemale = output[i]["nFemale"].toInt();
         qDebug() << tempDate;
@@ -401,12 +410,31 @@ void MainWindow::onChartResponse() {
         gender1->append(tempDate.toMSecsSinceEpoch(), tempNFemale);
         gender2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["nMale"].toInt());
 
+        if (output[i]["nMale"].toInt() > 0) {
+            qDebug() << "Add male to chart " << output[i];
+        }
+
+        if (output[i]["nFemale"].toInt() > 0) {
+            qDebug() << "Add female to chart " << output[i];
+        }
+
         age1->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n0_24"].toInt());
         age2->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n25_49"].toInt());
         age3->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n50_74"].toInt());
         age4->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n75_99"].toInt());
         age5->append(output[i]["period"].toDateTime().toMSecsSinceEpoch(), output[i]["n100_124"].toInt());
 
+        if (output[i]["nFemale"].toInt() > maxGender) {
+            maxGender = output[i]["nFemale"].toInt();
+        }
+
+        if (output[i]["nMale"].toInt() > maxGender) {
+            maxGender = output[i]["nMale"].toInt();
+        }
+
         chart->scroll(chart->plotArea().width() / 10, 0);
     }
+    qDebug() << "Last appended";
+    qDebug() << output.last()["period"] << " " << output.last()["nFemale"] << " " << output.last()["nMale"];
+
 }

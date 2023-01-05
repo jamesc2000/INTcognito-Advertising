@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    Databasehandler dbhandler;
+    Databasehandler dbhandler;
 //    dbhandler.testWrite();
 //    dbhandler.uploadAd("test", {"test"}, {"test"}, "test");
     MainWindow w;

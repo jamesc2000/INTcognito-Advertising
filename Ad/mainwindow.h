@@ -20,6 +20,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonParseError>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,18 +34,24 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void showEvent(QShowEvent *ev);
+
 private slots:
     void on_pushButton_clicked();
     void managerFinished(QNetworkReply *reply);
+    void onChartResponse();
 
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager *manager;
+    QNetworkAccessManager *manager2;
     QNetworkRequest request;
-    QNetworkReply * m_networkReply;
+    QNetworkReply * windowNetworkReply;
+    QNetworkRequest request2;
+    QNetworkReply * windowNetworkReply2;
     void uploadAd(QString adName, QList<QString> ageGroups, QList<QString> genders, QString imageUrl);
     void getChartData();
-    void onChartResponse();
 
     QLineSeries *gender1;
     QLineSeries *gender2;
