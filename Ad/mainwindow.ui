@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1197</width>
-    <height>661</height>
+    <width>1183</width>
+    <height>639</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>840</x>
+      <x>820</x>
       <y>30</y>
       <width>311</width>
-      <height>441</height>
+      <height>571</height>
      </rect>
     </property>
     <property name="title">
@@ -44,7 +44,7 @@
       <rect>
        <x>20</x>
        <y>60</y>
-       <width>166</width>
+       <width>271</width>
        <height>29</height>
       </rect>
      </property>
@@ -65,10 +65,10 @@
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>170</y>
+       <x>20</x>
+       <y>370</y>
        <width>112</width>
-       <height>101</height>
+       <height>91</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -99,9 +99,9 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>170</y>
+       <y>180</y>
        <width>154</width>
-       <height>181</height>
+       <height>171</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -153,7 +153,7 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>390</y>
+       <y>510</y>
        <width>241</width>
        <height>29</height>
       </rect>
@@ -170,24 +170,11 @@
       <rect>
        <x>20</x>
        <y>130</y>
-       <width>166</width>
+       <width>271</width>
        <height>29</height>
       </rect>
      </property>
     </widget>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_3">
-    <property name="geometry">
-     <rect>
-      <x>840</x>
-      <y>480</y>
-      <width>311</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Estimated Busiest Time of the Day</string>
-    </property>
    </widget>
    <widget class="QTabWidget" name="Predictor">
     <property name="geometry">
